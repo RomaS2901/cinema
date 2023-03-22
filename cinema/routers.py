@@ -9,3 +9,13 @@ router.register(
     cinema_hall_views.CinemaModelViewSet,
     basename="cinema",
 )
+router.register(
+    "hall",
+    cinema_hall_views.HallModelViewSet,
+    basename="hall",
+)
+router.register(
+    "seat",
+    cinema_hall_views.SeatModelViewSet,
+    basename="seat",
+)
