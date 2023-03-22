@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet
 
-# Create your views here.
+from cinema_hall.serializers import CinemaModelSerializer
+from cinema_hall.models import Cinema
+
+
+class CinemaModelViewSet(ModelViewSet):
+    queryset = Cinema.objects.all()
+    serializer_class = CinemaModelSerializer
