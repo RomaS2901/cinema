@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "users",
     "cinema_hall",
     "screening",
+    "purchase",
 ]
 
 MIDDLEWARE = [
