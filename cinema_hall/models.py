@@ -16,6 +16,9 @@ class Cinema(models.Model):
             "address",
         )
 
+    def __str__(self):
+        return self.name
+
 
 class Hall(models.Model):
     cinema = models.ForeignKey(
@@ -35,8 +38,8 @@ class Hall(models.Model):
             "cinema",
         )
 
-    def capacity(self):
-        raise NotImplementedError
+    def __str__(self):
+        return self.name
 
 
 class Seat(models.Model):
@@ -54,3 +57,6 @@ class Seat(models.Model):
             "row",
             "hall",
         )
+
+    def __str__(self):
+        return f"<{self.number} - {self.row}>"
