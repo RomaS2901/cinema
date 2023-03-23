@@ -31,3 +31,9 @@ class UserModelSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+
+# noinspection PyAbstractClass
+class LoginInputSerializer(serializers.Serializer):
+    email = serializers.CharField()
+    password = serializers.CharField()
