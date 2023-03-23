@@ -1,4 +1,5 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAdminUser
 
 from cinema_hall.serializers import (
@@ -9,7 +10,12 @@ from cinema_hall.serializers import (
 from cinema_hall.models import Cinema, Hall, Seat
 
 
-class CinemaViewSet(ModelViewSet):
+class CinemaViewSet(
+    CreateModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    GenericViewSet,
+):
     queryset = Cinema.objects.all()
     serializer_class = CinemaModelSerializer
     permission_classes = [
