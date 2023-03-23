@@ -1,4 +1,5 @@
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Cinema(models.Model):
@@ -8,6 +9,18 @@ class Cinema(models.Model):
     )
     address = models.CharField(
         max_length=256,
+    )
+    phone_number = PhoneNumberField(
+        null=True,
+    )
+    facebook_social_link = models.URLField(
+        null=True,
+    )
+    instagram_social_link = models.URLField(
+        null=True,
+    )
+    youtube_social_link = models.URLField(
+        null=True,
     )
 
     class Meta:
