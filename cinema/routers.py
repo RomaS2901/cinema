@@ -6,16 +6,16 @@ router = DefaultRouter()
 
 router.register(
     "cinema",
-    cinema_hall_views.CinemaModelViewSet,
+    cinema_hall_views.CinemaViewSet,
     basename="cinema",
 )
 router.register(
     "hall",
-    cinema_hall_views.HallModelViewSet,
+    cinema_hall_views.HallViewSet,
     basename="hall",
 )
 router.register(
     "seat",
-    cinema_hall_views.SeatModelViewSet,
+    cinema_hall_views.SeatViewSet,
     basename="seat",
 )

@@ -8,16 +8,16 @@ from cinema_hall.serializers import (
 from cinema_hall.models import Cinema, Hall, Seat
 
 
-class CinemaModelViewSet(ModelViewSet):
+class CinemaViewSet(ModelViewSet):
     queryset = Cinema.objects.all()
     serializer_class = CinemaModelSerializer
 
 
-class HallModelViewSet(ModelViewSet):
+class HallViewSet(ModelViewSet):
     queryset = Hall.objects.all()
     serializer_class = HallModelSerializer
 
 
-class SeatModelViewSet(ModelViewSet):
+class SeatViewSet(ModelViewSet):
     queryset = Seat.objects.all()
     serializer_class = SeatModelSerializer
