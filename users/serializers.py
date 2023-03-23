@@ -15,9 +15,13 @@ class UserModelSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
+            "balance",
         )
         write_only_fields = ("password",)
-        read_only_fields = ("id",)
+        read_only_fields = (
+            "id",
+            "balance",
+        )
 
     def create(self, validated_data):
         user = UserModel.objects.create(
