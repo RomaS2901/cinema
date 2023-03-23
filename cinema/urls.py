@@ -21,7 +21,7 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
-from cinema.routers import router
+from cinema.routers import urlpatterns as router_urlpatterns
 
 urlpatterns = [
     path("admin/", admin.site.urls),
