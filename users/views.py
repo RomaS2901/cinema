@@ -33,7 +33,9 @@ def login_api_view(
     serializer.is_valid(raise_exception=True)
     user = authenticate(
         request,
-        email=serializer.validated_data["email"],
+        # we use custom backend. email is used as username
+        # for Django built-in authentication
+        username=serializer.validated_data["email"],
         password=serializer.validated_data["password"],
     )
 

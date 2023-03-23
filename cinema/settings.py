@@ -130,6 +130,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.User"
 SESSION_INACTIVE_EXPIRY = 300
+AUTHENTICATION_BACKENDS = ["users.backends.EmailAuthenticateBackend"]
 
 
 REST_FRAMEWORK = {
