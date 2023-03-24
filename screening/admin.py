@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from cinema.admin import AdminInteractPermissionModelAdminMixin
+from screening.models import Movie
+
+
+admin.site.register(
+    Movie,
+    AdminInteractPermissionModelAdminMixin,
+)
