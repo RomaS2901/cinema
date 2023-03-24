@@ -5,9 +5,8 @@ from rest_framework.permissions import IsAdminUser
 from cinema_hall.serializers import (
     CinemaModelSerializer,
     HallModelSerializer,
-    SeatModelSerializer,
 )
-from cinema_hall.models import Cinema, Hall, Seat
+from cinema_hall.models import Cinema, Hall
 
 
 class CinemaViewSet(
@@ -23,11 +22,14 @@ class CinemaViewSet(
     ]
 
 
-class HallViewSet(ModelViewSet):
+class HallViewSet(
+    CreateModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    GenericViewSet,
+):
     queryset = Hall.objects.all()
     serializer_class = HallModelSerializer
-
-
-class SeatViewSet(ModelViewSet):
-    queryset = Seat.objects.all()
-    serializer_class = SeatModelSerializer
+    permission_classes = [
+        IsAdminUser,
+    ]

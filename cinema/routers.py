@@ -17,11 +17,6 @@ router.register(
     basename="hall",
 )
 router.register(
-    "seat",
-    cinema_hall_views.SeatViewSet,
-    basename="seat",
-)
-router.register(
     "users",
     users_views.UserViewSet,
     basename="users",
