@@ -4,25 +4,47 @@ from cinema_hall.models import Hall, Seat
 
 
 class Movie(models.Model):
+    class MovieDisplayFormat(models.TextChoices):
+        THREE_DIMENSION = "3D", "3D"
+        TWO_DIMENSION = "2D", "2D"
+
     title = models.CharField(
         max_length=200,
     )
-    release_date = models.DateField()
     director = models.CharField(
-        max_length=200,
+        max_length=255,
     )
+    display_format = models.CharField(
+        max_length=2,
+        default=MovieDisplayFormat.TWO_DIMENSION,
+        choices=MovieDisplayFormat.choices,
+    )
+    release_date = models.DateField()
     description = models.TextField()
-    imdb_ukr = models.URLField()
+    poster = models.ImageField(
+        upload_to="poster/",
+        null=False,
+    )
+    age_rating = models.CharField(
+        max_length=10,
+        null=True,
+    )
+    imdb_rating = models.FloatField(
+        null=True,
+    )
+    imdb_link = models.URLField(
+        null=True,
+    )
+    rent_start_date = models.DateField()
+    rent_end_date = models.DateField()
     duration = models.PositiveIntegerField()
-    start_date_right_to_rent = models.DateField()
-    end_date_right_to_rent = models.DateField()
 
     class Meta:
         unique_together = (
             "title",
             "director",
-            "start_date_right_to_rent",
-            "end_date_right_to_rent",
+            "rent_start_date",
+            "rent_end_date",
         )
 
 
