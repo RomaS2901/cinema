@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -61,15 +62,15 @@ class Seat(models.Model):
         on_delete=models.CASCADE,
         related_name="seats",
     )
-    number = models.PositiveIntegerField()
     row = models.PositiveIntegerField()
+    number = models.PositiveIntegerField()
 
     class Meta:
         unique_together = (
-            "number",
-            "row",
             "hall",
+            "row",
+            "number",
         )
 
     def __str__(self):
-        return f"<{self.number} - {self.row}>"
+        return f"<{self.row} - {self.number}>"
