@@ -1,4 +1,7 @@
+from datetime import date, datetime, timedelta, time
+
 from django.db import models
+from django.conf import settings
 
 from cinema_hall.models import Hall, Seat
 
@@ -24,16 +27,20 @@ class Movie(models.Model):
     poster = models.ImageField(
         upload_to="poster/",
         null=False,
+        blank=True,
     )
     age_rating = models.CharField(
         max_length=10,
         null=True,
+        blank=True,
     )
     imdb_rating = models.FloatField(
         null=True,
+        blank=True,
     )
     imdb_link = models.URLField(
         null=True,
+        blank=True,
     )
     rent_start_date = models.DateField()
     rent_end_date = models.DateField()
@@ -47,6 +54,9 @@ class Movie(models.Model):
             "rent_end_date",
         )
 
+    def __str__(self):
+        return self.title
+
 
 class ScreeningSession(models.Model):
     hall = models.ForeignKey(
@@ -59,7 +69,24 @@ class ScreeningSession(models.Model):
         related_name="screening_sessions",
         on_delete=models.CASCADE,
     )
-    start_time = models.DateTimeField()
+    start_time = models.TimeField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    @property
+    def end_time(self):
+        return (
+            datetime.combine(
+                date.today(),
+                self.start_time,
+            )
+            + timedelta(
+                seconds=self.movie.duration + settings.SCREENING_SESSION_BREAK,
+            )
+        ).time()
+
+    def __str__(self):
+        return f"{self.hall.name} at: {self.start_time}"
 
 
 class Ticket(models.Model):

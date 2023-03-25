@@ -1,4 +1,3 @@
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -6,22 +5,25 @@ from phonenumber_field.modelfields import PhoneNumberField
 class Cinema(models.Model):
     name = models.CharField(
         max_length=128,
-        db_index=True,
     )
     address = models.CharField(
         max_length=256,
     )
     phone_number = PhoneNumberField(
         null=True,
+        blank=True,
     )
     facebook_social_link = models.URLField(
         null=True,
+        blank=True,
     )
     instagram_social_link = models.URLField(
         null=True,
+        blank=True,
     )
     youtube_social_link = models.URLField(
         null=True,
+        blank=True,
     )
 
     class Meta:
@@ -43,7 +45,6 @@ class Hall(models.Model):
 
     name = models.CharField(
         max_length=16,
-        db_index=True,
     )
 
     class Meta:
