@@ -107,3 +107,4 @@ class Ticket(models.Model):
     is_sold = models.BooleanField(
         default=False,
     )
+    session_date_time = models.DateTimeField()
