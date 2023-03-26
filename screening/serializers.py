@@ -1,5 +1,6 @@
 from datetime import time, datetime, date, timedelta
 
+
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -36,6 +37,7 @@ class ScreeningSessionModelSerializer(serializers.ModelSerializer):
             comparator_end_date = date.today()
 
             if _start_time > _end_time:
+                # in case movie ends after midnight
                 comparator_end_date = date.today() + timedelta(days=1)
 
             return int(
@@ -99,6 +101,11 @@ class ScreeningSessionModelSerializer(serializers.ModelSerializer):
                     },
                 )
 
+        if attrs["start_date"] > attrs["end_date"]:
+            raise ValidationError(
+                {"start_date": "Start date comes after end date"},
+            )
+
         if attrs["start_date"] < attrs["movie"].rent_start_date:
             raise ValidationError(
                 {
@@ -125,6 +132,8 @@ class ScreeningSessionModelSerializer(serializers.ModelSerializer):
             hall=validated_data["hall"],
             movie=validated_data["movie"],
             start_time=validated_data["start_time"],
+            start_date=validated_data["start_date"],
+            end_date=validated_data["end_date"],
         )
 
         # create ticket for each seat in the hall with given price
@@ -132,14 +141,26 @@ class ScreeningSessionModelSerializer(serializers.ModelSerializer):
             "id",
             flat=True,
         )
-        tickets = [
-            Ticket(
-                screening=screening_session,
-                seat_id=seat_id,
-                price=validated_data["price"],
-            )
-            for seat_id in hall_seat_ids
-        ]
+        tickets = []
+        delta = screening_session.end_date - screening_session.start_date
+        for seat_id in hall_seat_ids:
+            for session_day in range(delta.days + 1):
+                tickets.append(
+                    Ticket(
+                        screening=screening_session,
+                        seat_id=seat_id,
+                        price=validated_data["price"],
+                        session_date_time=datetime.combine(
+                            screening_session.start_date
+                            + timedelta(
+                                days=session_day,
+                            ),
+                            screening_session.start_time,
+                        ),
+                    )
+                )
+
         Ticket.objects.bulk_create(
             tickets,
         )
+        return screening_session
