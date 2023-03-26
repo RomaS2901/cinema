@@ -7,16 +7,17 @@ from screening.models import Ticket
 class Order(models.Model):
     class OrderOperation(models.TextChoices):
         PURCHASE = "PR", "Purchase"
+        ADD_TO_CART = "CT", "Add to cart"
         RETURN = "RT", "Return"
 
     buyer = models.ForeignKey(
         get_user_model(),
-        related_name="purchases",
+        related_name="orders",
         on_delete=models.CASCADE,
     )
-    ticket = models.OneToOneField(
+    ticket = models.ForeignKey(
         Ticket,
-        related_name="purchase",
+        related_name="orders",
         on_delete=models.CASCADE,
     )
     operation = models.CharField(
@@ -26,3 +27,9 @@ class Order(models.Model):
     date = models.DateTimeField(
         auto_now_add=True,
     )
+
+    class Meta:
+        unique_together = (
+            "buyer",
+            "ticket",
+        )
