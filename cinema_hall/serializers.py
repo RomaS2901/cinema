@@ -14,18 +14,30 @@ class CinemaModelSerializer(serializers.ModelSerializer):
 
 
 class HallModelSerializer(serializers.ModelSerializer):
-    seats = serializers.SerializerMethodField()
+    seats_representation = serializers.SerializerMethodField()
+    seats = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+    )
 
     class Meta:
         model = Hall
         fields = "__all__"
 
     @staticmethod
-    def get_seats(
+    def get_seats_representation(
         hall: Hall,
     ):
-        return hall.seats.values_list("row").annotate(
-            row_count=Count("row"),
+        return (
+            hall.seats.values("row")
+            .annotate(
+                row_count=Count("row"),
+            )
+            .values_list(
+                "row_count",
+                flat=True,
+            )
+            .order_by("row")
         )
 
     def create(self, validated_data):
