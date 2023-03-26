@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 from cinema_hall import views as cinema_hall_views
 from users import views as users_views
 from screening import views as screening_views
+from purchase import views as purchase_views
 
 router = DefaultRouter()
 
@@ -26,6 +27,11 @@ router.register(
     "screening_session",
     screening_views.ScreeningSessionViewSet,
     basename="screening_session",
+)
+router.register(
+    "order",
+    purchase_views.OrderViewSet,
+    basename="order",
 )
 router.register(
     "users",
