@@ -4,7 +4,6 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 
@@ -41,9 +40,6 @@ def login_api_view(
 
     if user is not None:
         login(request, user)
-        request.session.set_expiry(
-            settings.SESSION_INACTIVE_EXPIRY,
-        )
         return Response(
             status=status.HTTP_200_OK,
         )
