@@ -132,9 +132,13 @@ def screening_session_raw(
         "movie": movie.id,
         "price": 100,
         "start_time": datetime.time(
-            hour=0,
-            minute=0,
-            second=0,
+            # latest day time, assure
+            # that `purchase.services.OrderingServiceError: Screening session in past`
+            # not raised when compare timezone.now() > ticket.session_date_time
+            # purchase / services.py:66
+            hour=23,
+            minute=59,
+            second=59,
         ),
         "start_date": datetime.date.today(),
         "end_date": datetime.date.today()
