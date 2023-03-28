@@ -75,6 +75,17 @@ def add_ticket_to_cart(
     )
 
 
+def remove_ticket_from_cart(
+    buyer: User,
+    order_id: int,
+):
+    Order.objects.filter(
+        id=order_id,
+        buyer=buyer,
+        operation=Order.OrderOperation.ADD_TO_CART,
+    ).delete()
+
+
 def buy_ticket(
     order_id: int,
 ):

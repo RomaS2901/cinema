@@ -89,6 +89,33 @@ class TestOrder:
             "total_price": ticket.price + other_ticket.price,
         }
 
+    def test_remove_item_from_cart(
+        self,
+        api_test_client: Client,
+        screening_session_with_tickets: ScreeningSession,
+    ):
+        ticket_to_add = screening_session_with_tickets.tickets.first()
+        api_test_client.post(
+            self.api_cart_endpoint,
+            data={
+                "ticket": ticket_to_add.id,
+            },
+        )
+        response = api_test_client.get(
+            self.api_cart_endpoint,
+        )
+        order_id = response.json()["items"][0]["id"]
+        response = api_test_client.delete(
+            self.api_endpoint + f"{order_id}/delete_from_cart/"
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        response = api_test_client.get(
+            self.api_cart_endpoint,
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {"items": [], "total_price": 0.0}
+
     def test_buy_ticket(
         self,
         api_test_client: Client,

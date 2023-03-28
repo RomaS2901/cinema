@@ -10,7 +10,12 @@ from purchase.serializers import (
     CreateCartInputSerializer,
     CartOutputSerializer,
 )
-from purchase.services import add_ticket_to_cart, buy_ticket, get_user_cart
+from purchase.services import (
+    add_ticket_to_cart,
+    buy_ticket,
+    get_user_cart,
+    remove_ticket_from_cart,
+)
 
 
 class OrderViewSet(GenericViewSet):
@@ -47,6 +52,23 @@ class OrderViewSet(GenericViewSet):
         )
         return Response(
             status=status.HTTP_201_CREATED,
+        )
+
+    @action(
+        methods=["DELETE"],
+        detail=True,
+    )
+    def delete_from_cart(
+        self,
+        request,
+        pk: int,
+    ):
+        remove_ticket_from_cart(
+            buyer=request.user,
+            order_id=pk,
+        )
+        return Response(
+            status=status.HTTP_204_NO_CONTENT,
         )
 
     @action(
