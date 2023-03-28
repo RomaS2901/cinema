@@ -10,6 +10,8 @@ class User(AbstractUser):
     email = models.EmailField(
         unique=True,
     )
-    balance = models.FloatField(
+    balance = models.DecimalField(
         default=DEFAULT_BALANCE,
+        max_digits=6,
+        decimal_places=2,
     )
