@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
@@ -89,6 +90,11 @@ class OrderViewSet(
             status=status.HTTP_204_NO_CONTENT,
         )
 
+    @extend_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: None,
+        }
+    )
     @action(
         methods=["POST"],
         detail=True,
@@ -106,6 +112,11 @@ class OrderViewSet(
             status=status.HTTP_204_NO_CONTENT,
         )
 
+    @extend_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: None,
+        }
+    )
     @action(
         methods=["POST"],
         detail=True,
