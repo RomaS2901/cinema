@@ -3,7 +3,9 @@ from rest_framework import status
 from django.test.client import Client
 
 from purchase.models import Order
+from purchase.services import OrderingServiceError
 from screening.models import ScreeningSession
+from users.models import User
 
 
 @pytest.mark.django_db
@@ -118,9 +120,11 @@ class TestOrder:
 
     def test_buy_ticket(
         self,
+        test_superuser: User,
         api_test_client: Client,
         screening_session_with_tickets: ScreeningSession,
     ):
+        origin_user_balance = test_superuser.balance
         ticket_to_buy = screening_session_with_tickets.tickets.first()
         api_test_client.post(
             self.api_cart_endpoint,
@@ -139,6 +143,7 @@ class TestOrder:
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
         ticket_to_buy.refresh_from_db()
+        test_superuser.refresh_from_db()
 
         assert (
             Order.objects.get(
@@ -147,3 +152,29 @@ class TestOrder:
             == Order.OrderOperation.PURCHASE
         )
         assert ticket_to_buy.is_sold is True
+        assert test_superuser.balance == origin_user_balance - ticket_to_buy.price
+
+    def test_buy_ticket_error_not_enough_funds(
+        self,
+        test_superuser: User,
+        api_test_client: Client,
+        screening_session_with_tickets: ScreeningSession,
+    ):
+        test_superuser.balance = 1
+        test_superuser.save()
+        ticket_to_buy = screening_session_with_tickets.tickets.first()
+        api_test_client.post(
+            self.api_cart_endpoint,
+            data={
+                "ticket": ticket_to_buy.id,
+            },
+        )
+        cart_response = api_test_client.get(
+            self.api_cart_endpoint,
+        )
+        order_id = cart_response.json()["items"][0]["id"]
+
+        with pytest.raises(OrderingServiceError):
+            api_test_client.post(
+                self.api_endpoint + f"{order_id}/buy_ticket/",
+            )

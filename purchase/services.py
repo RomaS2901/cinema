@@ -88,6 +88,7 @@ def remove_ticket_from_cart(
 
 def buy_ticket(
     order_id: int,
+    user: User,
 ):
     order = get_object_or_404(
         Order.objects.select_related(
@@ -96,10 +97,17 @@ def buy_ticket(
         pk=order_id,
     )
 
+    if order.ticket.price > user.balance:
+        raise OrderingServiceError(
+            "insufficient funds",
+        )
+
     if timezone.now() > order.ticket.session_date_time:
         raise OrderingServiceError("Screening session in past")
 
     order.operation = order.OrderOperation.PURCHASE
     order.ticket.is_sold = True
+    user.balance = user.balance - order.ticket.price
     order.ticket.save()
     order.save()
+    user.save()

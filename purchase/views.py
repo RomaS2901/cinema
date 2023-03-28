@@ -82,6 +82,7 @@ class OrderViewSet(GenericViewSet):
     ):
         buy_ticket(
             pk,
+            user=request.user,
         )
         return Response(
             status=status.HTTP_204_NO_CONTENT,
