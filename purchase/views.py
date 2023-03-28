@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import IsAuthenticated
@@ -15,15 +16,32 @@ from purchase.services import (
     buy_ticket,
     get_user_cart,
     remove_ticket_from_cart,
+    get_buyer_history,
+    return_purchased_ticket,
 )
 
 
-class OrderViewSet(GenericViewSet):
+class OrderViewSet(
+    ListModelMixin,
+    GenericViewSet,
+):
     queryset = Order.objects.all()
     serializer_class = OrderModelSerializer
     permission_classes = [
         IsAuthenticated,
     ]
+
+    def list(self, request, *args, **kwargs):
+        orders = get_buyer_history(
+            buyer=request.user,
+        )
+        serializer = self.get_serializer(
+            orders,
+            many=True,
+        )
+        return Response(
+            serializer.data,
+        )
 
     @action(
         methods=["GET"],
@@ -82,7 +100,24 @@ class OrderViewSet(GenericViewSet):
     ):
         buy_ticket(
             pk,
-            user=request.user,
+            buyer=request.user,
+        )
+        return Response(
+            status=status.HTTP_204_NO_CONTENT,
+        )
+
+    @action(
+        methods=["POST"],
+        detail=True,
+    )
+    def return_ticket(
+        self,
+        request,
+        pk: int,
+    ):
+        return_purchased_ticket(
+            order_id=pk,
+            buyer=request.user,
         )
         return Response(
             status=status.HTTP_204_NO_CONTENT,
