@@ -2,13 +2,10 @@ from django.db.models import Sum, QuerySet
 from django.utils import timezone
 from rest_framework.generics import get_object_or_404
 
+from purchase.errors import OrderingServiceError
 from purchase.models import Order
 from screening.models import Ticket
 from users.models import User
-
-
-class OrderingServiceError(Exception):
-    pass
 
 
 def get_user_cart(
@@ -88,7 +85,7 @@ def remove_ticket_from_cart(
 
 def buy_ticket(
     order_id: int,
-    user: User,
+    buyer: User,
 ):
     order = get_object_or_404(
         Order.objects.select_related(
@@ -97,7 +94,7 @@ def buy_ticket(
         pk=order_id,
     )
 
-    if order.ticket.price > user.balance:
+    if order.ticket.price > buyer.balance:
         raise OrderingServiceError(
             "insufficient funds",
         )
@@ -107,7 +104,61 @@ def buy_ticket(
 
     order.operation = order.OrderOperation.PURCHASE
     order.ticket.is_sold = True
-    user.balance = user.balance - order.ticket.price
+    buyer.balance -= order.ticket.price
     order.ticket.save()
     order.save()
-    user.save()
+    buyer.save()
+
+
+def get_buyer_history(
+    buyer: User,
+):
+    return Order.objects.filter(
+        buyer=buyer,
+        operation__in=[
+            Order.OrderOperation.PURCHASE,
+            Order.OrderOperation.RETURN,
+        ],
+    )
+
+
+def return_purchased_ticket(
+    buyer: User,
+    order_id: int,
+) -> Order:
+    order = get_object_or_404(
+        Order.objects.select_related(
+            "ticket",
+        ),
+        pk=order_id,
+        buyer=buyer,
+        operation=Order.OrderOperation.PURCHASE,
+    )
+
+    if Order.objects.filter(
+        buyer=buyer,
+        ticket=order.ticket,
+        operation=Order.OrderOperation.RETURN,
+    ).exists():
+        raise OrderingServiceError(
+            "Ticket is already returned",
+        )
+
+    if order.ticket.session_date_time < timezone.now():
+        raise OrderingServiceError(
+            "Funds can't be returned. Screening session already started.",
+        )
+
+    return_order = Order.objects.create(
+        buyer=buyer,
+        ticket=order.ticket,
+        operation=Order.OrderOperation.RETURN,
+    )
+    order.ticket.is_sold = False
+    buyer.balance += order.ticket.price
+
+    order.save()
+    order.ticket.save()
+    buyer.save()
+
+    return return_order
