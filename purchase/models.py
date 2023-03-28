@@ -32,4 +32,5 @@ class Order(models.Model):
         unique_together = (
             "buyer",
             "ticket",
+            "operation",
         )
