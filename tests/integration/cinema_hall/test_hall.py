@@ -27,7 +27,6 @@ class TestHall:
         self,
         api_test_client: Client,
         hall_with_seats: Hall,
-        hall_raw: dict[str, Any],
     ):
         response = api_test_client.get(
             self.api_endpoint,
@@ -38,6 +37,13 @@ class TestHall:
                 "id": hall_with_seats.id,
                 "cinema": hall_with_seats.cinema_id,
                 "name": hall_with_seats.name,
-                "seats_representation": hall_raw["seats"],
+                "seats": [
+                    {
+                        "id": seat.id,
+                        "number": seat.number,
+                        "row": seat.row,
+                    }
+                    for seat in hall_with_seats.seats.iterator()
+                ],
             },
         ]

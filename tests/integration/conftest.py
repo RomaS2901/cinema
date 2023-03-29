@@ -58,7 +58,7 @@ def hall_raw(
 ):
     return {
         "cinema": cinema.id,
-        "seats": [
+        "seats_tuple": [
             1,
             2,
             3,
@@ -79,7 +79,7 @@ def hall_with_seats(
     )
     seats = []
     for row, seats_count in enumerate(
-        hall_raw["seats"],
+        hall_raw["seats_tuple"],
         start=1,
     ):
         seats.extend(
