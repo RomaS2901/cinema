@@ -300,3 +300,27 @@ class TestOrder:
                 "ticket": 1,
             },
         ]
+
+    def test_user_total_spent(
+        self,
+        api_test_client: Client,
+        test_superuser: User,
+        screening_session_with_tickets: ScreeningSession,
+    ):
+        ticket = screening_session_with_tickets.tickets.first()
+
+        order = add_ticket_to_cart(
+            buyer=test_superuser,
+            ticket=ticket,
+        )
+        buy_ticket(
+            order_id=order.id,
+            buyer=test_superuser,
+        )
+
+        response = api_test_client.get(
+            self.api_endpoint + "total_spent_orders/",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {"total_spent": ticket.price}

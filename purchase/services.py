@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db.models import Sum, QuerySet
 from django.utils import timezone
 from rest_framework.generics import get_object_or_404
@@ -162,3 +164,12 @@ def return_purchased_ticket(
     buyer.save()
 
     return return_order
+
+
+def get_total_spent_amount(
+    buyer: User,
+) -> Decimal:
+    return Order.objects.filter(
+        buyer=buyer,
+        operation=Order.OrderOperation.PURCHASE,
+    ).aggregate(total_price=Sum("ticket__price"),)["total_price"]

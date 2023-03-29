@@ -19,6 +19,7 @@ from purchase.services import (
     remove_ticket_from_cart,
     get_buyer_history,
     return_purchased_ticket,
+    get_total_spent_amount,
 )
 
 
@@ -132,4 +133,18 @@ class OrderViewSet(
         )
         return Response(
             status=status.HTTP_204_NO_CONTENT,
+        )
+
+    @action(
+        methods=["GET"],
+        detail=False,
+    )
+    def total_spent_orders(self, request):
+        total_amount = get_total_spent_amount(
+            buyer=request.user,
+        )
+        return Response(
+            {
+                "total_spent": total_amount,
+            },
         )
