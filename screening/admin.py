@@ -7,7 +7,3 @@ admin.site.register(
     Movie,
     AdminInteractPermissionModelAdminMixin,
 )
-admin.site.register(
-    ScreeningSession,
-    AdminInteractPermissionModelAdminMixin,
-)

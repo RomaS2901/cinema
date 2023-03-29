@@ -2,6 +2,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.permissions import IsAdminUser
 
+from screening.filters import ScreeningSessionFilter
 from screening.models import Movie, ScreeningSession
 from screening.serializers import MovieModelSerializer, ScreeningSessionModelSerializer
 
@@ -28,3 +29,4 @@ class ScreeningSessionViewSet(
     permission_classes = [
         IsAdminUser,
     ]
+    filterset_class = ScreeningSessionFilter
