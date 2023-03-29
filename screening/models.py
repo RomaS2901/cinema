@@ -108,3 +108,10 @@ class Ticket(models.Model):
         default=False,
     )
     session_date_time = models.DateTimeField()
+
+    class Meta:
+        unique_together = (
+            "screening",
+            "seat",
+            "session_date_time",
+        )

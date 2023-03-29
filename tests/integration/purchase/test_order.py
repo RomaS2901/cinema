@@ -12,7 +12,7 @@ from purchase.services import (
     get_user_cart,
     return_purchased_ticket,
 )
-from screening.models import ScreeningSession
+from screening.models import ScreeningSession, Ticket
 from users.models import User
 
 
@@ -40,6 +40,79 @@ class TestOrder:
         assert response.status_code == status.HTTP_201_CREATED
         assert ticket_to_add.orders.get().operation == Order.OrderOperation.ADD_TO_CART
         assert ticket_to_add.is_sold is False
+
+    def test_add_ticket_to_cart_by_session_and_seat(
+        self,
+        api_test_client: Client,
+        screening_session_with_tickets: ScreeningSession,
+    ):
+        seat_id = screening_session_with_tickets.hall.seats.first().id
+        session_date_time = datetime.datetime.combine(
+            screening_session_with_tickets.start_date,
+            screening_session_with_tickets.start_time,
+        )
+        response = api_test_client.post(
+            self.api_cart_endpoint,
+            data={
+                "session": screening_session_with_tickets.id,
+                "seat": seat_id,
+                "session_date_time": session_date_time,
+            },
+        )
+
+        ticket = Ticket.objects.get(
+            screening=screening_session_with_tickets,
+            seat_id=seat_id,
+            session_date_time=session_date_time,
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        assert ticket.orders.get().operation == Order.OrderOperation.ADD_TO_CART
+        assert ticket.is_sold is False
+
+    @pytest.mark.parametrize(
+        [
+            "payload",
+        ],
+        [
+            [
+                {},
+            ],
+            [
+                {
+                    "session": 1,
+                },
+            ],
+            [
+                {
+                    "session": 1,
+                    "seat": 1,
+                },
+            ],
+            [
+                {
+                    "seat": 1,
+                    "session_date_time": 1,
+                },
+            ],
+            [
+                {
+                    "session": 1,
+                    "session_date_time": 1,
+                },
+            ],
+        ],
+    )
+    def test_add_ticket_to_cart_missing_payload(
+        self,
+        api_test_client: Client,
+        screening_session_with_tickets: ScreeningSession,
+        payload: dict[str, int],
+    ):
+        response = api_test_client.post(
+            self.api_cart_endpoint,
+            data=payload,
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_get_cart(
         self,

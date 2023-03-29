@@ -67,7 +67,10 @@ class OrderViewSet(
         )
         serializer.is_valid(raise_exception=True)
         add_ticket_to_cart(
-            ticket=serializer.validated_data["ticket"],
+            ticket=serializer.validated_data.get("ticket"),
+            session=serializer.validated_data.get("session"),
+            seat=serializer.validated_data.get("seat"),
+            session_date_time=serializer.validated_data.get("session_date_time"),
             buyer=self.request.user,
         )
         return Response(

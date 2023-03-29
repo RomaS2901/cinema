@@ -1,12 +1,14 @@
+import datetime
 from decimal import Decimal
 
 from django.db.models import Sum, QuerySet
 from django.utils import timezone
 from rest_framework.generics import get_object_or_404
 
+from cinema_hall.models import Seat
 from purchase.errors import OrderingServiceError
 from purchase.models import Order
-from screening.models import Ticket
+from screening.models import Ticket, ScreeningSession
 from users.models import User
 
 
@@ -53,9 +55,19 @@ def get_user_cart(
 
 def add_ticket_to_cart(
     buyer: User,
-    ticket: Ticket,
+    ticket: Ticket | None = None,
+    session: ScreeningSession | None = None,
+    seat: Seat | None = None,
+    session_date_time: datetime.datetime | None = None,
 ) -> Order:
     operation = Order.OrderOperation.ADD_TO_CART
+
+    ticket = ticket or get_object_or_404(
+        Ticket.objects.all(),
+        screening=session,
+        seat=seat,
+        session_date_time=session_date_time,
+    )
 
     if ticket.is_sold:
         raise OrderingServiceError(
