@@ -1,6 +1,6 @@
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
 
 from screening.filters import ScreeningSessionFilter
 from screening.models import Movie, ScreeningSession
@@ -26,7 +26,11 @@ class ScreeningSessionViewSet(
 ):
     serializer_class = ScreeningSessionModelSerializer
     queryset = ScreeningSession.objects.all()
-    permission_classes = [
-        IsAdminUser,
-    ]
     filterset_class = ScreeningSessionFilter
+
+    def get_permissions(self):
+        if self.action == "list":
+            permission_classes = [IsAuthenticatedOrReadOnly]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
